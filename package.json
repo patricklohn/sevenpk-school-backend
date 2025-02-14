@@ -1,10 +1,12 @@
 {
   "name": "sevenpk-school-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Aplicação com objetivo de auxiliar programdores com conteudo resumido de linguagens de programação e marcação entre outras anotações. Aplicação em React e Node.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js",
+    "dev" : "node server.js"
   },
   "keywords": [],
   "author": "",
