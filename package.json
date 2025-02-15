@@ -6,7 +6,6 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
-    
   },
   "keywords": [],
   "author": "",
@@ -19,6 +18,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0",
     "prisma": "^6.3.1"
   },
   "devDependencies": {
