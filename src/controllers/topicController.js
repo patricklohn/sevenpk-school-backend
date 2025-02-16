@@ -36,6 +36,53 @@ async function createTopic(req,res){
     }
 }
 
+async function getTopics(req,res){
+    
+    try {
+        const getAllTopics = await prisma.topic.findMany();
+        res.status(200).json(getAllTopics);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "Internal Server Error" });
+    } finally {
+        await prisma.$disconnect(); // Fecha a conexão do Prisma corretamente
+    }
+    
+}
+
+async function getTopic(req,res){
+    try {
+        const id = parseInt(req.params.id);
+        const getTopic = await prisma.topic.findMany({where:{id}});
+        res.status(200).json(getTopic);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "Internal Server Error" });
+    } finally {
+        await prisma.$disconnect(); // Fecha a conexão do Prisma corretamente
+    }
+}
+
+async function deleteTopic(req,res){
+    try {
+        const {id} = parseInt(req.params)
+        const topicDelete = await prisma.topic.delete({where:{id:id}});
+        req.status(200).json({
+            message: "topic deleted successfully",
+            topic: topicDelete
+        })
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: "Internal server Error"});        
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
 export default {
-    createTopic
+    createTopic,
+    getTopics,
+    getTopic,
+    deleteTopic,
 }
