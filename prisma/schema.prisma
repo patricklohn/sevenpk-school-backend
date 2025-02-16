@@ -10,21 +10,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  password String
+  // Relacionamento: Um usuário pode ter vários tópicos
+  topics   Topic[]
+}
+
 model Category {
   id        Int      @id @default(autoincrement())
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  // Relacionamento: Uma categoria pode ter vários tópicos
+  topics    Topic[]
 
   @@map("category")
 }
 
 model Topic {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(100)
-  content String @db.VarChar(5000)
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(100)
+  content  String   @db.VarChar(5000)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
+
+  // Relacionamento com User
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relacionamento com Category
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  //onDelete: Cascade garante que se o user for deletado o topic tambem será 
 
   @@map("topic")
 }
