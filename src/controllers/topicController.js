@@ -31,8 +31,6 @@ async function createTopic(req,res){
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Internal Server Error" });
-    } finally {
-        await prisma.$disconnect(); // Fecha a conexão do Prisma corretamente
     }
 }
 
@@ -44,10 +42,7 @@ async function getTopics(req,res){
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Internal Server Error" });
-    } finally {
-        await prisma.$disconnect(); // Fecha a conexão do Prisma corretamente
     }
-    
 }
 
 async function getTopic(req,res){
@@ -58,25 +53,51 @@ async function getTopic(req,res){
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Internal Server Error" });
-    } finally {
-        await prisma.$disconnect(); // Fecha a conexão do Prisma corretamente
     }
 }
 
 async function deleteTopic(req,res){
     try {
-        const {id} = parseInt(req.params)
-        const topicDelete = await prisma.topic.delete({where:{id:id}});
-        req.status(200).json({
+        const id = parseInt(req.params.id)
+        const topicDelete = await prisma.topic.delete({where:{id}});
+        res.status(200).json({
             message: "topic deleted successfully",
             topic: topicDelete
         })
+    } catch (error) {
+        console.error("Error deleting topic:", error);
+        res.status(500).json({ message: "Internal server error" });      
+    }
+}
+
+async function updateTopic(req,res) {
+    try {
+        const id = parseInt(req.params.id);
+        const name = req.body.name;
+        const content = req.body.content; 
         
+        if(!name || !content){
+            return res.status(400).json({ message: "name and content are required" });
+        }
+
+        if(typeof content !== "string" || content.length > 5000){
+            return res.status(400).json({ message: "Content cannot be longer than 5000 characters" });
+        }
+
+        const editTopic = await prisma.topic.update(
+            {
+                where: {id:id},
+                data:{
+                    name,
+                    content
+                }
+            }
+        )
+
+        res.status(200).json({message:"Topic updated successfully",topic:editTopic})
     } catch (error) {
         console.log(error)
-        res.status(500).json({message: "Internal server Error"});        
-    } finally {
-        await prisma.$disconnect();
+        res.status(500).json({message: "Internal server error"})
     }
 }
 
@@ -85,4 +106,5 @@ export default {
     getTopics,
     getTopic,
     deleteTopic,
+    updateTopic
 }
