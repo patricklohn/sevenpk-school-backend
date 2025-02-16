@@ -18,3 +18,13 @@ model Category {
 
   @@map("category")
 }
+
+model Topic {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(100)
+  content String @db.VarChar(5000)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  @@map("topic")
+}
