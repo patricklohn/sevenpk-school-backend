@@ -39,11 +39,11 @@ model Topic {
 
   // Relacionamento com User
   userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id])
 
   // Relacionamento com Category
   categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id])
 
   //onDelete: Cascade garante que se o user for deletado o topic tambem será 
 
