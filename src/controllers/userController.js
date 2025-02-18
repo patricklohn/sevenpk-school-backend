@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../middleware/password.js";
 
 const prisma = new PrismaClient();
 
 async function createUser(req, res) {
   try {
     const { username, email, password } = req.body;
-
+    const hashedPassword = await hashPassword(password);
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -14,7 +15,7 @@ async function createUser(req, res) {
       data: {
         username,
         email,
-        password,
+        password: hashedPassword,
       },
     });
 
