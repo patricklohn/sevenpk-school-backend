@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../utils/password.js";
-
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function createUser(req, res) {
@@ -30,22 +31,40 @@ async function createUser(req, res) {
   }
 }
 
-async function getAllUser(req,res){
+async function login(req, res) {
   try {
-    const allUser = await prisma.user.findMany();
-    if(!allUser){
-      console.log("No user found")
-      res.status(404).json({message:"No user found"})
-      return
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-    res.status(200).json(allUser);
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.SECRET,
+      {
+        expiresIn: "2d",
+      }
+    );
+
+    res.status(200).json({ token: token, userId: user.id, email: user.email });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({message:"Internal error server"});
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
 export default {
   createUser,
-  getAllUser,
+  login,
 };
