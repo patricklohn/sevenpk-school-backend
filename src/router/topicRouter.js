@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 
 import topicController from "../controllers/topicController.js";
 
