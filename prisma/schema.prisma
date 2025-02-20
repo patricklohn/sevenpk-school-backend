@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -44,7 +44,6 @@ model Topic {
   // Relacionamento com Category
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
-
 
   @@map("topic")
 }
