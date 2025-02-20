@@ -4,14 +4,27 @@ const prisma = new PrismaClient();
 
 async function createTopic(req, res) {
   try {
-    const { name } = req.body;
-    const content = req.body.content;
+    const { name, category, content } = req.body;
+    const user = req.user?.id; // Pega o ID do usuário autenticado
 
-    if (!name || !content) {
-      return res.status(400).json({ message: "name and content are required" });
+    if (!user) {
+      return res.status(401).json({ message: "User not authenticated" });
     }
 
-    if (content.length > 5000) {
+    if (!name || !content || !category) {
+      return res
+        .status(400)
+        .json({ message: "name, content, and category are required" });
+    }
+
+    const categoryExists = await prisma.category.findUnique({
+      where: { id: Number(category) },
+    });
+
+    if (!categoryExists) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    if (typeof content !== "string" || content.length > 5000) {
       return res
         .status(400)
         .json({ message: "Content cannot be longer than 5000 characters" });
@@ -20,16 +33,22 @@ async function createTopic(req, res) {
     const newTopic = await prisma.topic.create({
       data: {
         name,
-        content: content,
+        content,
+        category: {
+          connect: { id: Number(category) }, // Conecta à categoria existente
+        },
+        user: {
+          connect: { id: Number(user) }, // Conecta ao usuário existente
+        },
       },
     });
 
     res.status(201).json({
       message: "Topic created successfully",
-      category: newTopic,
+      topic: newTopic,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error creating topic:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
